@@ -1,0 +1,40 @@
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9574:9000"
+      # MinIO Console is available at http://localhost:9321
+      - "9321:9001"
+    env_file: minio.env
+    healthcheck:
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
+      interval: 1s
+      timeout: 10s
+      retries: 5
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+     - dudes_network
+
+  minio-create-bucket:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    env_file: minio.env
+    entrypoint: /minio_init.sh
+    volumes:
+      - ./buckets_list.txt:/buckets_list
+      - ./minio_init.sh:/minio_init.sh
+    networks:
+     - dudes_network
+
+volumes:
+  minio_data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./minio_dir"
+
