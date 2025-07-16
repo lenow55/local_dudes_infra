@@ -6,9 +6,15 @@ services:
     volumes:
       - "zookeeper_data:/bitnami"
     networks:
-     - dudes_network
+      - dudes_network
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
   kafka:
     image: bitnami/kafka:3.8.0-debian-12-r7
     ports:
@@ -17,7 +23,7 @@ services:
     volumes:
       - "kafka_data:/bitnami"
     networks:
-     - dudes_network
+      - dudes_network
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
@@ -25,18 +31,19 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT_HOST://kafka:9092,PLAINTEXT://127.0.0.1:29092
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT:PLAINTEXT
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
     container_name: kafka-ui
     ports:
       - "9089:8080"
     networks:
-     - dudes_network
+      - dudes_network
     environment:
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
-    restart: unless-stopped
+    restart: none
 
 volumes:
   zookeeper_data:
