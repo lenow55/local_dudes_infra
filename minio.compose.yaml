@@ -15,7 +15,7 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - dudes_network
+     - dudes_network
 
   minio-create-bucket:
     image: minio/mc
@@ -23,17 +23,12 @@ services:
       minio:
         condition: service_healthy
     env_file: minio.env
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "sed -i 's/\\r$$//' /minio_init.sh /buckets_list && chmod +x /minio_init.sh && /minio_init.sh",
-      ]
+    entrypoint: /minio_init.sh
     volumes:
       - ./buckets_list.txt:/buckets_list
       - ./minio_init.sh:/minio_init.sh
     networks:
-      - dudes_network
+     - dudes_network
 
 volumes:
   minio_data:
@@ -42,3 +37,4 @@ volumes:
       type: "none"
       o: "bind"
       device: "./minio_dir"
+
