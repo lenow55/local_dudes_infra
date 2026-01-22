@@ -36,6 +36,15 @@ services:
     depends_on:
       zookeeper:
         condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - sh
+        - -c
+        - /opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:29092
+      interval: 30s
+      timeout: 10s
+      retries: 5
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
     container_name: kafka-ui
