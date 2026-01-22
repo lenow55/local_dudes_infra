@@ -1,6 +1,6 @@
 services:
   zookeeper:
-    image: bitnami/zookeeper:3.9.3-debian-12-r0
+    image: bitnamilegacy/zookeeper:3.9.3-debian-12-r22
     ports:
       - "8798:2181"
     volumes:
@@ -16,7 +16,7 @@ services:
       retries: 5
       start_period: 20s
   kafka:
-    image: bitnami/kafka:3.8.0-debian-12-r7
+    image: bitnamilegacy/kafka:3.9.0-debian-12-r9
     ports:
       - "9097:9092"
       - "29092:29092"
