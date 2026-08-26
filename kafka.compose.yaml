@@ -46,14 +46,15 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s
-  kafka-ui:
-    image: provectuslabs/kafka-ui:v0.7.2
-    container_name: kafka-ui
+  kafbat:
+    image: kafbat/kafka-ui:latest
+    container_name: kafbat
     ports:
       - "9089:8080"
     networks:
       - dudes_network
     environment:
+      - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     restart: none
