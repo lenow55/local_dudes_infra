@@ -48,7 +48,6 @@ services:
       start_period: 20s
   kafka-mcp:
     image: ghcr.io/tuannvm/kafka-mcp-server:2.0.2
-    container_name: kafka-mcp
     ports:
       - "9098:8080"
     networks:
@@ -64,7 +63,6 @@ services:
     restart: unless-stopped
   kafbat:
     image: kafbat/kafka-ui:v1.5.0
-    container_name: kafbat
     ports:
       - "9089:8080"
     networks:

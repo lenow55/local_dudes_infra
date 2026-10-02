@@ -1,39 +1,41 @@
 services:
-  minio:
-    image: minio/minio
+  rustfs:
+    image: rustfs/rustfs:latest
     ports:
       - "9574:9000"
-      # MinIO Console is available at http://localhost:9321
+      # RustFS Console is available at http://localhost:9321
       - "9321:9001"
-    env_file: minio.env
+    env_file: rustfs.env
+    environment:
+      - RUSTFS_VOLUMES=/data
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+      - RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS=*
     healthcheck:
-      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
       interval: 20s
       timeout: 10s
       retries: 5
-    command: server /data --console-address ":9001"
+      start_period: 20s
     volumes:
-      - minio_data:/data
+      - rustfs_data:/data
     networks:
       - dudes_network
 
-  minio-create-bucket:
-    image: minio/mc
+  rustfs-create-bucket:
+    image: rustfs/rc:latest
     depends_on:
-      minio:
+      rustfs:
         condition: service_healthy
-    env_file: minio.env
-    entrypoint: /minio_init.sh
+    env_file: rustfs.env
+    entrypoint: /rustfs_init.sh
     volumes:
       - ./buckets_list.txt:/buckets_list
-      - ./minio_init.sh:/minio_init.sh
+      - ./rustfs_init.sh:/rustfs_init.sh
     networks:
       - dudes_network
 
 volumes:
-  minio_data:
+  rustfs_data:
     driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "./minio_dir"
