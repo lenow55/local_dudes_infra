@@ -60,7 +60,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    restart: unless-stopped
+    restart: none
   kafbat:
     image: kafbat/kafka-ui:v1.5.0
     ports:
